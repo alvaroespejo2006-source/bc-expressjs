@@ -1,35 +1,71 @@
-// ============================================
-// ENTRY POINT — Orquesta todo el flujo
-// ============================================
-
-import { readItems } from './reader.js';
-import { filterByCategory, calculateSummary } from './processor.js';
-import { writeReport } from './writer.js';
+import { writeFile, mkdir } from 'fs/promises';
+import { join } from 'path';
+import { readPlants } from './reader.js';
+import { buildSummary, filterByCategory, getAvailableCategories } from './processor.js';
 import type { Report } from './types.js';
 
-// TODO: Parsear el argumento --category desde process.argv
-// process.argv = ['node', 'script.ts', '--category', 'electronics']
-// Si '--category' está en los args, el siguiente elemento es el valor.
-// Si no está, el filtro debe ser null.
-//
-// Ejemplo:
-// const args = process.argv.slice(2);
-// const categoryIndex = args.indexOf('--category');
-// const categoryFilter: string | null = categoryIndex !== -1 ? args[categoryIndex + 1] : null;
+const OUTPUT_PATH = join(import.meta.dirname, '..', 'output', 'report.json');
 
-// TODO: Implementar la función main con el siguiente flujo:
-// 1. Parsear los argumentos (ver arriba)
-// 2. Leer los datos con readItems()
-// 3. Filtrar con filterByCategory() pasando el filtro parseado
-// 4. Calcular el resumen con calculateSummary()
-// 5. Construir el objeto Report con: generatedAt (ISO string), appliedFilter, summary, items filtrados
-// 6. Imprimir el resumen en consola (total, activos, precio promedio, categorías)
-// 7. Escribir el reporte en disco con writeReport()
-//
-// Recuerda manejar errores con try/catch y llamar process.exit(1) si algo falla.
-//
-// Firma esperada:
-// async function main(): Promise<void>
+/**
+ * Extrae el valor de --category desde process.argv, si viene.
+ * Ejemplo: pnpm dev -- --category interior
+ */
+function getCategoryArg(): string | null {
+  const args = process.argv.slice(2);
+  const flagIndex = args.indexOf('--category');
+  if (flagIndex === -1 || !args[flagIndex + 1]) return null;
+  return args[flagIndex + 1]!;
+}
 
-// TODO: Llamar main() al final del archivo
-// main();
+async function main(): Promise<void> {
+  console.log('🌱 Leyendo catálogo del vivero...\n');
+
+  const allPlants = await readPlants();
+  const categoryArg = getCategoryArg();
+
+  let plantsToReport = allPlants;
+
+  if (categoryArg) {
+    const filtered = filterByCategory(allPlants, categoryArg);
+
+    if (!filtered) {
+      // Requisito: si la categoría no existe, avisar y listar las disponibles
+      console.warn(`⚠️  No existe la categoría "${categoryArg}".`);
+      console.warn(`   Categorías disponibles: ${getAvailableCategories(allPlants).join(', ')}`);
+      return;
+    }
+
+    plantsToReport = filtered;
+  }
+
+  const summary = buildSummary(plantsToReport);
+
+  console.log('=== 📊 Resumen del Vivero ===');
+  console.log(`Total de plantas: ${summary.total}`);
+  console.log(`Activas: ${summary.activeCount} | Inactivas: ${summary.inactiveCount}`);
+  console.log(`Precio promedio: $${summary.averagePrice.toLocaleString('es-CO')}`);
+  console.log(
+    `Más cara: ${summary.mostExpensive.name} ($${summary.mostExpensive.price.toLocaleString('es-CO')})`
+  );
+  console.log(
+    `Más barata: ${summary.cheapest.name} ($${summary.cheapest.price.toLocaleString('es-CO')})`
+  );
+
+  const report: Report = {
+    generatedAt: new Date().toISOString(),
+    filterApplied: categoryArg,
+    summary,
+    plants: plantsToReport,
+  };
+
+  try {
+    await mkdir(join(import.meta.dirname, '..', 'output'), { recursive: true });
+    await writeFile(OUTPUT_PATH, JSON.stringify(report, null, 2), 'utf-8');
+    console.log(`\n✅ Reporte guardado en output/report.json`);
+  } catch (error) {
+    console.error('❌ No se pudo escribir el reporte:', error instanceof Error ? error.message : error);
+    process.exit(1);
+  }
+}
+
+main();

@@ -1,29 +1,30 @@
-// ============================================
-// READER — Lee el archivo de datos JSON
-// ============================================
-
 import { readFile } from 'fs/promises';
 import { join } from 'path';
-import type { Item } from './types.js';
+import type { Plant } from './types.js';
 
-// TODO: Implementar la función readItems
-// Debe:
-// 1. Construir la ruta al archivo data/items.json usando join() e import.meta.dirname
-// 2. Leer el archivo con readFile (de 'fs/promises') usando 'utf-8'
-// 3. Parsear el JSON y retornar el array de Item[]
-// 4. Si ocurre un error, lanzar un Error descriptivo con el mensaje original
-//
-// Firma esperada:
-// export async function readItems(): Promise<Item[]>
-//
-// Ejemplo de estructura:
-// export async function readItems(): Promise<Item[]> {
-//   const filePath = join(import.meta.dirname, '..', 'data', 'items.json');
-//   try {
-//     const raw = await readFile(filePath, 'utf-8');
-//     return JSON.parse(raw) as Item[];
-//   } catch (err) {
-//     // Lanza un error descriptivo — el main() lo atrapará con try/catch
-//     throw new Error(`...`);
-//   }
-// }
+// import.meta.dirname = directorio del archivo actual (equivalente ESM de __dirname)
+const DATA_PATH = join(import.meta.dirname, '..', 'data', 'plants.json');
+
+/**
+ * Lee y parsea el catálogo de plantas del vivero.
+ * Usa fs/promises (no fs.readFileSync) para no bloquear el Event Loop.
+ */
+export async function readPlants(): Promise<Plant[]> {
+  let raw: string;
+
+  try {
+    raw = await readFile(DATA_PATH, 'utf-8');
+  } catch (error) {
+    // Requisito: si data/plants.json no existe, error descriptivo + exit(1)
+    console.error(`❌ No se encontró el archivo de datos en: ${DATA_PATH}`);
+    console.error('   Verifica que data/plants.json exista antes de ejecutar la herramienta.');
+    process.exit(1);
+  }
+
+  try {
+    return JSON.parse(raw) as Plant[];
+  } catch {
+    console.error('❌ El archivo plants.json no contiene un JSON válido.');
+    process.exit(1);
+  }
+}

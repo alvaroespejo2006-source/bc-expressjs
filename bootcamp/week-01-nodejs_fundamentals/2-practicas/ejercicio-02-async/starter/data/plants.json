@@ -1,0 +1,5 @@
+[
+  { "id": 1, "name": "Monstera deliciosa", "category": "interior", "price": 45000 },
+  { "id": 2, "name": "Suculenta Echeveria", "category": "suculentas", "price": 8000 },
+  { "id": 3, "name": "Rosal rojo", "category": "exterior", "price": 25000 }
+]

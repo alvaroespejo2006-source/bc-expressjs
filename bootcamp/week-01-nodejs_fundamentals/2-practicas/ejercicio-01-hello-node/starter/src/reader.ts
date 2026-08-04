@@ -1,14 +1,15 @@
-// ============================================
-// PASO 2: Leer el archivo JSON con fs/promises
-// ============================================
-// Descomenta las siguientes líneas para el Paso 2:
+// Paso 2: lectura de archivo con fs/promises (no bloquea el Event Loop)
 
-// import { readFile } from 'fs/promises';
-// import { join } from 'path';
-// import type { Product } from './types.js';
-//
-// export async function readProducts(): Promise<Product[]> {
-//   const filePath = join(import.meta.dirname, '..', 'data', 'products.json');
-//   const raw = await readFile(filePath, 'utf-8');
-//   return JSON.parse(raw) as Product[];
-// }
+import { readFile } from 'fs/promises';
+import { join } from 'path';
+import type { Plant } from './types.js';
+
+export async function readPlants(): Promise<Plant[]> {
+  const filePath = join(import.meta.dirname, '..', 'data', 'plants.json');
+
+  // await pausa la función hasta que readFile termine — sin bloquear el Event Loop
+  const raw = await readFile(filePath, 'utf-8');
+
+  // JSON.parse convierte el string JSON en un objeto JavaScript
+  return JSON.parse(raw) as Plant[];
+}
