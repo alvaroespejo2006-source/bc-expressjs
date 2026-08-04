@@ -1,45 +1,28 @@
-// ============================================
-// TIPOS — Adapta estas interfaces a tu dominio
-// ============================================
-// Renombra 'Item' al recurso de tu dominio asignado.
-// Ejemplo: Book, Medicine, Member, Dish, Room...
+// Dominio: Vivero de Plantas
+// El recurso principal del proyecto es "Plant", adaptado del "Item" genérico del starter.
 
-// TODO: Renombrar 'Item' al recurso de tu dominio asignado
-export interface Item {
-  id: string;
+export interface Plant {
+  id: number;
   name: string;
   category: string;
   price: number;
   stock: number;
+  supplier: string;
   active: boolean;
 }
 
-// TODO: Agregar campos específicos de tu dominio
-// Ejemplo para Biblioteca:
-// export interface Book {
-//   id: string;
-//   title: string;
-//   author: string;
-//   genre: string;
-//   year: number;
-//   available: boolean;
-// }
-
-// Resumen que el procesador debe calcular
-export interface ItemSummary {
+export interface Summary {
   total: number;
-  active: number;
-  inactive: number;
+  activeCount: number;
+  inactiveCount: number;
   averagePrice: number;
-  mostExpensive: Item;
-  cheapest: Item;
-  categories: string[];
+  mostExpensive: Plant;
+  cheapest: Plant;
 }
 
-// Reporte final que se escribirá en output/report.json
 export interface Report {
   generatedAt: string;
-  appliedFilter: string | null;
-  summary: ItemSummary;
-  items: Item[];
+  filterApplied: string | null;
+  summary: Summary;
+  plants: Plant[];
 }

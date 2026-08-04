@@ -1,21 +1,12 @@
-// ============================================
-// TIPOS COMPARTIDOS — Ejercicio 02
-// ============================================
-
-// Interfaz para los usuarios del archivo data/users.json
-export interface User {
-  id: string;
+export interface Supplier {
+  id: number;
   name: string;
-  email: string;
-  role: 'admin' | 'moderator' | 'user';
-  active: boolean;
+  city: string;
 }
 
-// Interfaz para los products del archivo data/products.json
-export interface Product {
-  id: string;
+export interface Plant {
+  id: number;
   name: string;
   category: string;
   price: number;
-  stock: number;
 }

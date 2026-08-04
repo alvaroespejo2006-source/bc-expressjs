@@ -1,0 +1,14 @@
+[
+  { "id": 1, "name": "Monstera deliciosa", "category": "interior", "price": 45000, "stock": 12, "supplier": "Vivero Andino", "active": true },
+  { "id": 2, "name": "Suculenta Echeveria", "category": "suculentas", "price": 8000, "stock": 40, "supplier": "PlantaMás", "active": true },
+  { "id": 3, "name": "Ficus lyrata", "category": "interior", "price": 65000, "stock": 5, "supplier": "Vivero Andino", "active": true },
+  { "id": 4, "name": "Rosal rojo", "category": "exterior", "price": 25000, "stock": 18, "supplier": "Flores del Campo", "active": true },
+  { "id": 5, "name": "Cactus San Pedro", "category": "suculentas", "price": 32000, "stock": 3, "supplier": "PlantaMás", "active": true },
+  { "id": 6, "name": "Helecho Boston", "category": "interior", "price": 22000, "stock": 15, "supplier": "Vivero Andino", "active": true },
+  { "id": 7, "name": "Lavanda", "category": "aromaticas", "price": 12000, "stock": 30, "supplier": "Flores del Campo", "active": true },
+  { "id": 8, "name": "Bonsái Ficus", "category": "arboles", "price": 120000, "stock": 2, "supplier": "Bonsái Kioto", "active": true },
+  { "id": 9, "name": "Palma areca", "category": "exterior", "price": 55000, "stock": 4, "supplier": "Vivero Andino", "active": true },
+  { "id": 10, "name": "Orquídea Phalaenopsis", "category": "interior", "price": 38000, "stock": 9, "supplier": "PlantaMás", "active": true },
+  { "id": 11, "name": "Romero", "category": "aromaticas", "price": 9500, "stock": 0, "supplier": "Flores del Campo", "active": false },
+  { "id": 12, "name": "Pino bonsái", "category": "arboles", "price": 95000, "stock": 6, "supplier": "Bonsái Kioto", "active": true }
+]
