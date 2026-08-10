@@ -7,11 +7,10 @@
 import { Router } from 'express';
 import * as controller from '../controllers/items.controller';
 
-export const itemsRouter = Router();
+export const plantsRouter = Router();
 
-// TODO: Registrar los 5 endpoints del CRUD
-// itemsRouter.get('/', controller.getAll);
-// itemsRouter.get('/:id', controller.getById);
-// itemsRouter.post('/', controller.create);
-// itemsRouter.put('/:id', controller.update);
-// itemsRouter.delete('/:id', controller.remove);
+plantsRouter.get('/', controller.getAll);
+plantsRouter.get('/:id', controller.getById);
+plantsRouter.post('/', controller.create);
+plantsRouter.put('/:id', controller.update);
+plantsRouter.delete('/:id', controller.remove);
