@@ -1,6 +1,6 @@
 import express from 'express';
 import type { Application } from 'express';
-// import { itemsRouter } from './routes/items.routes.js';   // se importa en Paso 2
+import { itemsRouter } from './routes/items.routes.js';   // se importa en Paso 2
 
 export function createApp(): Application {
   const app = express();
@@ -17,7 +17,7 @@ export function createApp(): Application {
   // PASO 2: Registrar el router de items
   // ============================================
   // Descomenta las siguientes líneas:
-  // app.use('/api/v1/items', itemsRouter);
+app.use('/api/v1/items', itemsRouter);
 
   return app;
 }
