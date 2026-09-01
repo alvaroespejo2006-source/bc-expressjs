@@ -6,40 +6,26 @@ import morgan from 'morgan';
 
 const isDev = process.env['NODE_ENV'] !== 'production';
 
-// TODO: Implementar el logger de Winston
-// 1. Usar createLogger con:
-//    - level: 'http' en desarrollo, 'warn' en producción
-//    - format.combine + format.timestamp en todos los entornos
-//    - En desarrollo: format.colorize + format.printf con timestamp, level, message
-//    - En producción: format.json
-// 2. Transports:
-//    - Console siempre
-//    - File({ filename: 'logs/error.log', level: 'error' }) solo en producción
-//
-// Ejemplo de la estructura esperada:
-// export const logger = createLogger({ ... });
-
-// Placeholder — reemplaza con tu implementación
 export const logger = createLogger({
   level: isDev ? 'http' : 'warn',
-  format: format.combine(
-    format.timestamp(),
-    // TODO: reemplaza con colorize+printf en dev o json en prod
-    format.simple()
-  ),
+  format: isDev
+    ? format.combine(
+        format.timestamp(),
+        format.colorize(),
+        format.printf(({ timestamp, level, message }) => `[${timestamp}] ${level}: ${message}`)
+      )
+    : format.combine(format.timestamp(), format.json()),
   transports: [
-    // TODO: nuevo transport.Console() con el formato correcto
     new transports.Console(),
-    // TODO: añade transport.File solo en producción
+    ...(isDev
+      ? []
+      : [new transports.File({ filename: 'logs/error.log', level: 'error' })]),
   ],
 });
 
-// TODO: Implementar la stream de Morgan que redirige a logger.http()
-// export const morganStream = { write: (message: string) => logger.http(message.trim()) };
-//
-// TODO: Implementar el middleware de Morgan con la stream
-// const morganFormat = isDev ? 'dev' : 'combined';
-// export const morganMiddleware = morgan(morganFormat, { stream: morganStream });
+export const morganStream = {
+  write: (message: string) => logger.http(message.trim()),
+};
 
-// Placeholder — reemplaza con tu implementación
-export const morganMiddleware = morgan('dev');
+const morganFormat = isDev ? 'dev' : 'combined';
+export const morganMiddleware = morgan(morganFormat, { stream: morganStream });

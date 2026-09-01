@@ -5,25 +5,19 @@ import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import * as service from '../services/products.service';
 import { SingleResponse, PaginatedResponse } from '../types';
-
-// ============================================
-// PASO 4 — Schema para validar :id en params
-// Descomenta las siguientes líneas:
-// ============================================
-// import {
-//   createProductSchema,
-//   updateProductSchema,
-//   CreateProductDto,
-//   UpdateProductDto,
-// } from '../schemas/product.schema';
+import {
+  createProductSchema,
+  updateProductSchema,
+  CreateProductDto,
+  UpdateProductDto,
+} from '../schemas/product.schema';
 
 // ============================================
 // UTIL INTERNO — valida que :id sea numérico
-// Descomenta las siguientes líneas:
 // ============================================
-// const idSchema = z.coerce.number().int().positive({
-//   message: 'El id debe ser un número entero positivo',
-// });
+const idSchema = z.coerce.number().int().positive({
+  message: 'El id debe ser un número entero positivo',
+});
 
 // ============================================
 // GET /products?page=1&limit=10 (ya funciona)
@@ -41,28 +35,23 @@ export async function getAll(req: Request, res: Response, next: NextFunction): P
 
 // ============================================
 // GET /products/:id
-// PASO 4: descomenta la validación de :id
+// PASO 4: validación de :id
 // ============================================
 export async function getById(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    // Paso 4a — Reemplaza esta línea con la validación de :id
-    const id = Number(req.params['id']);
-
-    // PASO 4 — Validación de :id con idSchema
-    // Descomenta las siguientes líneas y elimina la línea de arriba:
-    // const parsed = idSchema.safeParse(req.params['id']);
-    // if (!parsed.success) {
-    //   res.status(400).json({
-    //     error: 'Validation Error',
-    //     message: 'Parámetro inválido',
-    //     issues: parsed.error.issues.map((issue) => ({
-    //       field: issue.path.join('.') || 'id',
-    //       message: issue.message,
-    //     })),
-    //   });
-    //   return;
-    // }
-    // const id = parsed.data;
+    const parsed = idSchema.safeParse(req.params['id']);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: 'Validation Error',
+        message: 'Parámetro inválido',
+        issues: parsed.error.issues.map((issue) => ({
+          field: issue.path.join('.') || 'id',
+          message: issue.message,
+        })),
+      });
+      return;
+    }
+    const id = parsed.data;
 
     const product = await service.findById(id);
     if (!product) {
@@ -81,24 +70,19 @@ export async function getById(req: Request, res: Response, next: NextFunction): 
 // ============================================
 export async function create(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    // PASO 2 — Validar req.body con createProductSchema
-    // Descomenta las siguientes líneas y elimina el bloque "sin validación" de abajo:
-    // const result = createProductSchema.safeParse(req.body);
-    // if (!result.success) {
-    //   res.status(400).json({
-    //     error: 'Validation Error',
-    //     message: 'Datos de entrada inválidos',
-    //     issues: result.error.issues.map((issue) => ({
-    //       field: issue.path.join('.'),
-    //       message: issue.message,
-    //     })),
-    //   });
-    //   return;
-    // }
-    // const dto: CreateProductDto = result.data;
-
-    // Sin validación (temporalmente, reemplazar con PASO 2)
-    const dto = req.body as { name: string; price: number; stock?: number };
+    const result = createProductSchema.safeParse(req.body);
+    if (!result.success) {
+      res.status(400).json({
+        error: 'Validation Error',
+        message: 'Datos de entrada inválidos',
+        issues: result.error.issues.map((issue) => ({
+          field: issue.path.join('.'),
+          message: issue.message,
+        })),
+      });
+      return;
+    }
+    const dto: CreateProductDto = result.data;
 
     const product = await service.create(dto);
     res.status(201).json({ data: product } satisfies SingleResponse<typeof product>);
@@ -114,27 +98,33 @@ export async function create(req: Request, res: Response, next: NextFunction): P
 // ============================================
 export async function update(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    // Paso 4b — Reemplaza esta línea con la validación de :id (igual que getById)
-    const id = Number(req.params['id']);
+    const parsedId = idSchema.safeParse(req.params['id']);
+    if (!parsedId.success) {
+      res.status(400).json({
+        error: 'Validation Error',
+        message: 'Parámetro inválido',
+        issues: parsedId.error.issues.map((issue) => ({
+          field: issue.path.join('.') || 'id',
+          message: issue.message,
+        })),
+      });
+      return;
+    }
+    const id = parsedId.data;
 
-    // PASO 3 — Validar req.body con updateProductSchema
-    // Descomenta las siguientes líneas y elimina el bloque "sin validación" de abajo:
-    // const result = updateProductSchema.safeParse(req.body);
-    // if (!result.success) {
-    //   res.status(400).json({
-    //     error: 'Validation Error',
-    //     message: 'Datos de entrada inválidos',
-    //     issues: result.error.issues.map((issue) => ({
-    //       field: issue.path.join('.'),
-    //       message: issue.message,
-    //     })),
-    //   });
-    //   return;
-    // }
-    // const dto: UpdateProductDto = result.data;
-
-    // Sin validación (temporalmente, reemplazar con PASO 3)
-    const dto = req.body as { name?: string; price?: number; stock?: number };
+    const result = updateProductSchema.safeParse(req.body);
+    if (!result.success) {
+      res.status(400).json({
+        error: 'Validation Error',
+        message: 'Datos de entrada inválidos',
+        issues: result.error.issues.map((issue) => ({
+          field: issue.path.join('.'),
+          message: issue.message,
+        })),
+      });
+      return;
+    }
+    const dto: UpdateProductDto = result.data;
 
     const product = await service.update(id, dto);
     if (!product) {
@@ -153,8 +143,19 @@ export async function update(req: Request, res: Response, next: NextFunction): P
 // ============================================
 export async function remove(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    // Paso 4c — Reemplaza esta línea con la validación de :id (igual que getById)
-    const id = Number(req.params['id']);
+    const parsed = idSchema.safeParse(req.params['id']);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: 'Validation Error',
+        message: 'Parámetro inválido',
+        issues: parsed.error.issues.map((issue) => ({
+          field: issue.path.join('.') || 'id',
+          message: issue.message,
+        })),
+      });
+      return;
+    }
+    const id = parsed.data;
 
     const deleted = await service.remove(id);
     if (!deleted) {

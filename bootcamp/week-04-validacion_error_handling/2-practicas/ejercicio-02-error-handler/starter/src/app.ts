@@ -17,18 +17,12 @@ app.use('/api/v1/products', productsRouter);
 
 // ============================================
 // PASO 4 — Registrar notFound y errorHandler
-// El orden es CRÍTICO. Descomenta las siguientes
-// líneas y colócalas DESPUÉS de todas las rutas:
+// El orden es CRÍTICO.
 // ============================================
 // 3. Rutas no encontradas (3 params — middleware normal)
-// app.use(notFound);
-//
-// 4. Manejador global de errores (4 params — error handler)
-// app.use(errorHandler);
+app.use(notFound);
 
-// Suprime el warning de TypeScript para los imports no usados
-// (puedes eliminarlas al descomentar arriba)
-void notFound;
-void errorHandler;
+// 4. Manejador global de errores (4 params — error handler)
+app.use(errorHandler);
 
 export default app;
