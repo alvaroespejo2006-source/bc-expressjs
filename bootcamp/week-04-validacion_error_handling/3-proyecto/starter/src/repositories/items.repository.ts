@@ -1,43 +1,34 @@
 // ============================================
 // REPOSITORY — capa de acceso a datos (en memoria)
 // ============================================
-import { Item } from '../types';
+import { Plant } from '../types';
 
-export type CreateItemRepoDto = Omit<Item, 'id' | 'createdAt'>;
-export type UpdateItemRepoDto = Partial<CreateItemRepoDto>;
+export type CreatePlantRepoDto = Omit<Plant, 'id' | 'createdAt'>;
+export type UpdatePlantRepoDto = Partial<CreatePlantRepoDto>;
 
-// TODO: inicializar el array con al menos 3 ítems de seed correspondientes a tu dominio
-let items: Item[] = [
-  // TODO: reemplaza con datos reales de tu dominio
-  { id: 1, name: 'Ejemplo Item 1', description: 'Descripción 1', price: 10.0, stock: 100, createdAt: new Date() },
-  { id: 2, name: 'Ejemplo Item 2', description: 'Descripción 2', price: 20.0, stock: 50, createdAt: new Date() },
-  { id: 3, name: 'Ejemplo Item 3', description: 'Descripción 3', price: 30.0, stock: 25, createdAt: new Date() },
+let items: Plant[] = [
+  { id: 1, name: 'Suculenta', species: 'Echeveria elegans', price: 15000, stock: 20, category: 'cactus', createdAt: new Date() },
+  { id: 2, name: 'Potus', species: 'Epipremnum aureum', price: 12000, stock: 30, category: 'interior', createdAt: new Date() },
+  { id: 3, name: 'Ficus lyrata', species: 'Ficus lyrata', price: 45000, stock: 8, category: 'interior', createdAt: new Date() },
 ];
 
 let nextId = 4;
 
-// TODO: implementar todos los métodos CRUD async
-// Todos deben retornar Promise<T> y hacer copias defensivas ({ ...item })
-
-export async function findAll(): Promise<Item[]> {
-  // TODO: retornar copia del array
+export async function findAll(): Promise<Plant[]> {
   return [...items];
 }
 
-export async function findById(id: number): Promise<Item | undefined> {
-  // TODO: buscar por id y retornar copia defensiva o undefined
+export async function findById(id: number): Promise<Plant | undefined> {
   return items.find((i) => i.id === id);
 }
 
-export async function create(dto: CreateItemRepoDto): Promise<Item> {
-  // TODO: crear nuevo item con nextId++ y fecha actual
-  const item: Item = { id: nextId++, ...dto, createdAt: new Date() };
+export async function create(dto: CreatePlantRepoDto): Promise<Plant> {
+  const item: Plant = { id: nextId++, ...dto, createdAt: new Date() };
   items.push(item);
   return { ...item };
 }
 
-export async function update(id: number, dto: UpdateItemRepoDto): Promise<Item | undefined> {
-  // TODO: encontrar por id, aplicar cambios, retornar copia
+export async function update(id: number, dto: UpdatePlantRepoDto): Promise<Plant | undefined> {
   const index = items.findIndex((i) => i.id === id);
   if (index === -1) return undefined;
   items[index] = { ...items[index]!, ...dto };
@@ -45,7 +36,6 @@ export async function update(id: number, dto: UpdateItemRepoDto): Promise<Item |
 }
 
 export async function remove(id: number): Promise<boolean> {
-  // TODO: eliminar por id, retornar true si existía
   const index = items.findIndex((i) => i.id === id);
   if (index === -1) return false;
   items.splice(index, 1);

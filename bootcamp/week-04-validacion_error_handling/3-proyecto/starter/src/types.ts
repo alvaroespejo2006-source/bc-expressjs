@@ -1,15 +1,14 @@
 // ============================================
-// TYPES — adapta Item al recurso de tu dominio
-// Ejemplo: Book, Medicine, Member, Dish, etc.
+// TYPES — Vivero de plantas
 // ============================================
 
-// TODO: renombra Item y sus campos al recurso de tu dominio asignado
-export interface Item {
+export interface Plant {
   id: number;
-  name: string;       // Renombra según tu dominio (title, medicationName, etc.)
-  description: string; // Puedes cambiar este campo por otros relevantes
+  name: string;
+  species: string;
   price: number;
   stock: number;
+  category: string;
   createdAt: Date;
 }
 
