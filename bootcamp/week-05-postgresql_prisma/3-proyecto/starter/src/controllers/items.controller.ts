@@ -1,17 +1,60 @@
-// src/controllers/items.controller.ts — Capa HTTP
-// ============================================================
-// TODO: Implementar los handlers del controlador
-//
-// Lineamientos:
-//   - Cada función: async (req, res, next) => try { ... } catch (err) { next(err); }
-//   - getAll:  extraer page/limit de req.query, llamar service.listItems, res.json()
-//   - getById: extraer id de req.params, llamar service.getItem, res.json()
-//   - create:  validar con createItemSchema.safeParse(req.body), res.status(201).json()
-//   - update:  validar con updateItemSchema.safeParse(req.body), res.json()
-//   - remove:  llamar service.deleteItem, res.status(204).send()
-//
-// Recuerda:
-//   - Validar que page/limit sean números enteros positivos (Math.max, Math.min)
-//   - Si safeParse falla → res.status(400).json({ status: 'error', message: ... })
-//   - No manejar AppError aquí — el errorHandler global lo hace
-// ============================================================
+import { Request, Response, NextFunction } from 'express';
+import { z } from 'zod';
+import * as service from '../services/items.service';
+import { createPlantSchema, updatePlantSchema } from '../schemas/items.schema';
+import { AppError } from '../errors/AppError';
+
+const idSchema = z.coerce.number().int().positive();
+
+export async function getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const page = Number(req.query['page']) || 1;
+    const limit = Number(req.query['limit']) || 10;
+    const result = await service.findAll(page, limit);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getById(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const id = idSchema.parse(req.params['id']);
+    const plant = await service.findById(id);
+    if (!plant) throw new AppError(404, 'Planta no encontrada');
+    res.json(plant);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function create(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const dto = createPlantSchema.parse(req.body);
+    const plant = await service.create(dto);
+    res.status(201).json(plant);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function update(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const id = idSchema.parse(req.params['id']);
+    const dto = updatePlantSchema.parse(req.body);
+    const plant = await service.update(id, dto);
+    res.json(plant);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function remove(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const id = idSchema.parse(req.params['id']);
+    await service.remove(id);
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+}
