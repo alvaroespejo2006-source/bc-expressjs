@@ -1,6 +1,3 @@
-// prisma/seed.ts — Datos iniciales del dominio
-// Ejecutar con: pnpm dlx prisma db seed
-
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -8,27 +5,40 @@ const prisma = new PrismaClient();
 async function main(): Promise<void> {
   console.log('🌱 Iniciando seed...');
 
-  // ============================================================
-  // TODO: Implementar el seed de tu dominio
-  //
-  // Lineamientos:
-  //   1. Limpiar datos existentes (deleteMany) para idempotencia
-  //   2. Crear registros del recurso secundario primero (si tienes relación)
-  //   3. Crear mínimo 5 registros del recurso principal
-  //   4. Usar console.log para confirmar la cantidad creada
-  //
-  // Ejemplo — Biblioteca:
-  //   await prisma.book.deleteMany();
-  //   await prisma.author.deleteMany();
-  //   const tolkien = await prisma.author.create({ data: { name: 'J.R.R. Tolkien', ... } });
-  //   const result = await prisma.book.createMany({
-  //     data: [
-  //       { title: 'El Señor de los Anillos', isbn: 'ISBN-001', authorId: tolkien.id, ... },
-  //       ...
-  //     ],
-  //   });
-  //   console.log(`✅ ${result.count} libros creados`);
-  // ============================================================
+  await prisma.plant.deleteMany();
+  await prisma.category.deleteMany();
+
+  const cactus = await prisma.category.upsert({
+    where: { name: 'Cactus' },
+    update: {},
+    create: { name: 'Cactus' },
+  });
+
+  const interior = await prisma.category.upsert({
+    where: { name: 'Interior' },
+    update: {},
+    create: { name: 'Interior' },
+  });
+
+  const exterior = await prisma.category.upsert({
+    where: { name: 'Exterior' },
+    update: {},
+    create: { name: 'Exterior' },
+  });
+
+  console.log('✅ Categorías creadas:', cactus.name, interior.name, exterior.name);
+
+  const result = await prisma.plant.createMany({
+    data: [
+      { name: 'Suculenta', species: 'Echeveria elegans', price: 15000, stock: 20, sku: 'PLANT-001', categoryId: cactus.id },
+      { name: 'Cactus barril', species: 'Echinocactus grusonii', price: 25000, stock: 15, sku: 'PLANT-002', categoryId: cactus.id },
+      { name: 'Potus', species: 'Epipremnum aureum', price: 12000, stock: 30, sku: 'PLANT-003', categoryId: interior.id },
+      { name: 'Ficus lyrata', species: 'Ficus lyrata', price: 45000, stock: 8, sku: 'PLANT-004', categoryId: interior.id },
+      { name: 'Helecho', species: 'Nephrolepis exaltata', price: 18000, stock: 12, sku: 'PLANT-005', categoryId: exterior.id },
+    ],
+  });
+
+  console.log(`✅ Seed completo: ${result.count} plantas creadas`);
 }
 
 main()

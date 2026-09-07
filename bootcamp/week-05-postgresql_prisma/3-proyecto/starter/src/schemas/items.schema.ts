@@ -1,27 +1,19 @@
-// src/schemas/items.schema.ts — Validación Zod para el recurso principal
-// ============================================================
-// TODO: Define el schema Zod para tu recurso según tu dominio
-//
-// Lineamientos:
-//   - createItemSchema: todos los campos requeridos con validaciones
-//   - updateItemSchema: todos opcionales (partial)
-//   - Exportar tipos inferidos: CreateItemDto, UpdateItemDto
-//
-// Ejemplo — Biblioteca (libro):
-//
-// import { z } from 'zod';
-//
-// export const createItemSchema = z.object({
-//   title:     z.string().min(1).max(200),
-//   isbn:      z.string().regex(/^[0-9-]{10,17}$/, 'ISBN inválido'),
-//   year:      z.number().int().min(1000).max(new Date().getFullYear()),
-//   pages:     z.number().int().positive().optional(),
-//   available: z.boolean().default(true),
-//   authorId:  z.number().int().positive().optional(),
-// });
-//
-// export const updateItemSchema = createItemSchema.partial();
-//
-// export type CreateItemDto = z.infer<typeof createItemSchema>;
-// export type UpdateItemDto = z.infer<typeof updateItemSchema>;
-// ============================================================
+import { z } from 'zod';
+
+const basePlantSchema = z.object({
+  name: z.string({ error: 'name es obligatorio' }).min(1).trim(),
+  species: z.string({ error: 'species es obligatorio' }).min(1).trim(),
+  price: z.number({ error: 'price es obligatorio' }).positive('Debe ser mayor a 0'),
+  stock: z.number().int().nonnegative(),
+  sku: z.string({ error: 'sku es obligatorio' }).min(1).trim(),
+  categoryId: z.number().int().positive().optional().nullable(),
+});
+
+export const createPlantSchema = basePlantSchema.extend({
+  stock: basePlantSchema.shape.stock.optional().default(0),
+});
+
+export const updatePlantSchema = basePlantSchema.partial();
+
+export type CreatePlantDto = z.infer<typeof createPlantSchema>;
+export type UpdatePlantDto = z.infer<typeof updatePlantSchema>;
